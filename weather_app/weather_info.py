@@ -1,5 +1,5 @@
  #!/usr/bin/env python
- 
+
 import requests                             #getting data from weather.com using the weather api
 from geopy.geocoders import Nominatim       #getting the coordinates and other data of the place
 from datetime import date                   #getting the current date
@@ -43,9 +43,7 @@ elif t=="Monthly" or t=="monthly":
 location = geolocator.geocode(place,timeout=20)
 print(location.address)                                 #shows the complete details of the place entered
 print((location.latitude, location.longitude))          #shows the lat and lon of the place
-# print(place)
-# print(today)
-# print(type_of_forecast)
+
 
 #current data of the place
 if type_of_forecast=="Today" or type_of_forecast=="today":
