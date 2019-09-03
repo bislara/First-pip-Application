@@ -1,4 +1,0 @@
-#!/usr/bin/env python
-name= "hi dibya"
-# echo "hey there, this is my first pip package"
-print("Hi lara")

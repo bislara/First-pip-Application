@@ -1,3 +1,5 @@
+ #!/usr/bin/env python
+ 
 import requests                             #getting data from weather.com using the weather api
 from geopy.geocoders import Nominatim       #getting the coordinates and other data of the place
 from datetime import date                   #getting the current date
@@ -64,7 +66,7 @@ if type_of_forecast=="Today" or type_of_forecast=="today":
 else :
     response=requests.get("https://api.weather.com/v2/turbo/vt1dailyForecast?apiKey=d522aa97197fd864d36b418f39ebb323&format=json&geocode=" +str(location.latitude) + "," + str(location.longitude) + "&language=en-IN&units=m")
     data=response.json()
-    
+
     #get the 5 day weather details of the given place
     if type_of_forecast=="5-day" or type_of_forecast=="5 day":
         print("Co-ordinate - latitude :" + str(location.latitude)+ " longitude :" + str(location.longitude))
