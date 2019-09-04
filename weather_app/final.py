@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 
 import requests                             #getting data from weather.com using the weather api
-from geopy.geocoders import Nominatim       #getting the coordinates and other data of the place
 from datetime import date                   #getting the current date
-from geopy.exc import GeocoderTimedOut      #getting the coordinates and other data of the place
-
-geolocator = Nominatim(user_agent="LARA")   #Nominatim (from the Latin, 'by name') is a tool to search OSM data by name and address (geocoding) and to generate synthetic addresses of OSM points (reverse geocoding). It can be found at nominatim.openstreetmap.org
 
 place="Rourkela Odisha"                     #default place
 today = date.today()                        #default date
@@ -40,23 +36,15 @@ elif t=="Monthly" or t=="monthly":
     type_of_forecast=t
 
 #get the coordinates of the place
-location = geolocator.geocode(place,timeout=20)
-print(location.address)                                 #shows the complete details of the place entered
-print((location.latitude, location.longitude))          #shows the lat and lon of the place
-
 request1= requests.get("https://api.weather.com/v3/location/search?query="+ str(p)+"&locationType=city&language=en-IN&format=json&apiKey=d522aa97197fd864d36b418f39ebb323")
 place_data=request1.json()
-# print(place_data)
 # print(place_data["location"]["latitude"][0])
 # print(place_data["location"]["longitude"][0])
 
-#current data of the place
-if type_of_forecast=="Today" or type_of_forecast=="today":
-    resp= requests.get("https://api.weather.com/v2/turbo/vt1observation?apiKey=d522aa97197fd864d36b418f39ebb323&format=json&geocode=" +str(place_data["location"]["latitude"][0]) + "," + str(place_data["location"]["longitude"][0]) + "&language=en-IN&units=m")
-    data1=resp.json()
-    # print(data1)
-    print("The current weather of " + str(location.address) + " is :-")
-    print("  Co-ordinate - latitude :" + str(location.latitude)+ " longitude :" + str(location.longitude))
+
+def today_data(data1):
+    print("The current weather of " + str(place_data["location"]["address"][0]) + " is :-")
+    print("  Co-ordinate - latitude :" + str(place_data["location"]["latitude"][0])+ " longitude :" + str(place_data["location"]["longitude"][0]))
     print("  Temperature :" + str(data1["vt1observation"]["temperature"])+" deg C " +str(data1["vt1observation"]["phrase"])+ " as of "+str(data1["vt1observation"]["observationTime"]))
     print("  Feels like "+str(data1["vt1observation"]["feelsLike"]) + " deg C" )
     print("  Dew point :"+str(data1["vt1observation"]["dewPoint"])+ " deg")
@@ -66,14 +54,10 @@ if type_of_forecast=="Today" or type_of_forecast=="today":
     print("  Visibility :"+str(data1["vt1observation"]["visibility"])+ " km")
     print("  Pressure: "+str(data1["vt1observation"]["altimeter"])+"mb "+ str(data1["vt1observation"]["barometerTrend"]))
 
-else :
-    response=requests.get("https://api.weather.com/v2/turbo/vt1dailyForecast?apiKey=d522aa97197fd864d36b418f39ebb323&format=json&geocode=" +str(place_data["location"]["latitude"][0]) + "," + str(place_data["location"]["longitude"][0]) + "&language=en-IN&units=m")
-    data=response.json()
 
-    #get the 5 day weather details of the given place
-    if type_of_forecast=="5-day" or type_of_forecast=="5 day":
-        print("Co-ordinate - latitude :" + str(location.latitude)+ " longitude :" + str(location.longitude))
-        print("Weather of "+str(location.address)+" for the next 5 days are :-")
+def day5_data(data):
+        print("Co-ordinate - latitude :" + str(place_data["location"]["latitude"][0])+ " longitude :" + str(place_data["location"]["longitude"][0]))
+        print("Weather of "+str(place_data["location"]["address"][0])+" for the next 5 days are :-")
         for i in range(0,5):
             print(str(i+1)+"- "+data["vt1dailyForecast"]["dayOfWeek"][i])
             print("   Description : Day- "+str(data["vt1dailyForecast"]["day"]["phrase"][i])+" ,Night- "+str(data["vt1dailyForecast"]["night"]["phrase"][i]))
@@ -88,11 +72,10 @@ else :
             print("   Moonrise : "+str(data["vt1dailyForecast"]["moonrise"][i]))
             print("   MoonSet : "+str(data["vt1dailyForecast"]["moonset"][i]))
             print(" ")
-
-    #get the 10 day weather details of the given place
-    elif type_of_forecast=="10-day" or type_of_forecast=="10 day":
-        print("Co-ordinate - latitude :" + str(location.latitude)+ " longitude :" + str(location.longitude))
-        print("Weather of "+str(location.address)+" for the next 10 days are :-")
+    
+def day10_data(data):
+        print("Co-ordinate - latitude :" + str(place_data["location"]["latitude"][0])+ " longitude :" + str(place_data["location"]["longitude"][0]))
+        print("Weather of "+str(place_data["location"]["address"][0])+" for the next 10 days are :-")
         for i in range(0,10):
             print(str(i+1)+"- "+data["vt1dailyForecast"]["dayOfWeek"][i])
             print("   Description : Day- "+str(data["vt1dailyForecast"]["day"]["phrase"][i])+" ,Night- "+str(data["vt1dailyForecast"]["night"]["phrase"][i]))
@@ -107,11 +90,11 @@ else :
             print("   Moonrise : "+str(data["vt1dailyForecast"]["moonrise"][i]))
             print("   MoonSet : "+str(data["vt1dailyForecast"]["moonset"][i]))
             print(" ")
-    
-    #get the weekend weather details of the given place
-    elif type_of_forecast=="weekend" or type_of_forecast=="Weekend":
-        print("Co-ordinate - latitude :" + str(location.latitude)+ " longitude :" + str(location.longitude))
-        print("Weather of "+str(location.address)+" for the next 2 weekends are :-")
+
+
+def weekend_data(data):
+        print("Co-ordinate - latitude :" + str(place_data["location"]["latitude"][0])+ " longitude :" + str(place_data["location"]["longitude"][0]))
+        print("Weather of "+str(place_data["location"]["address"][0])+" for the next 2 weekends are :-")
         j=0
         for i in range(0,15):
             if data["vt1dailyForecast"]["dayOfWeek"][i]=="Saturday":
@@ -144,5 +127,29 @@ else :
                 print("   Moonrise : "+str(data["vt1dailyForecast"]["moonrise"][i]))
                 print("   MoonSet : "+str(data["vt1dailyForecast"]["moonset"][i]))
                 print(" ")
+
+
+
+#current data of the place
+if type_of_forecast=="Today" or type_of_forecast=="today":
+    resp= requests.get("https://api.weather.com/v2/turbo/vt1observation?apiKey=d522aa97197fd864d36b418f39ebb323&format=json&geocode=" +str(place_data["location"]["latitude"][0]) + "," + str(place_data["location"]["longitude"][0]) + "&language=en-IN&units=m")
+    data1=resp.json()
+    today_data(data1)
+    
+else :
+    response=requests.get("https://api.weather.com/v2/turbo/vt1dailyForecast?apiKey=d522aa97197fd864d36b418f39ebb323&format=json&geocode=" +str(place_data["location"]["latitude"][0]) + "," + str(place_data["location"]["longitude"][0]) + "&language=en-IN&units=m")
+    data=response.json()
+
+    #get the 5 day weather details of the given place
+    if type_of_forecast=="5-day" or type_of_forecast=="5 day":
+        day5_data(data)
+
+    #get the 10 day weather details of the given place
+    elif type_of_forecast=="10-day" or type_of_forecast=="10 day":
+        day10_data(data)
+    
+    #get the weekend weather details of the given place
+    elif type_of_forecast=="weekend" or type_of_forecast=="Weekend":
+        weekend_data(data)
 
 
