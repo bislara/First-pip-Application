@@ -1,18 +1,14 @@
- #!/usr/bin/env python
+#!/usr/bin/env python
 
 import requests                             #getting data from weather.com using the weather api
-from geopy.geocoders import Nominatim       #getting the coordinates and other data of the place
 from datetime import date                   #getting the current date
-from geopy.exc import GeocoderTimedOut      #getting the coordinates and other data of the place
-
-geolocator = Nominatim(user_agent="LARA")   #Nominatim (from the Latin, 'by name') is a tool to search OSM data by name and address (geocoding) and to generate synthetic addresses of OSM points (reverse geocoding). It can be found at nominatim.openstreetmap.org
 
 place="Rourkela Odisha"                     #default place
 today = date.today()                        #default date
 type_of_forecast="today"                    #default type of forecast
 
-p=input("Enter place in details ie place and state :")         #user place input
-d=input("Enter date in yyyy-mm-dd :")                          #user date input
+p=raw_input("Enter place in details ie place and state :")         #user place input
+d=raw_input("Enter date in yyyy-mm-dd :")                          #user date input
 print("Enter type of forecast you want :")                     #options for type of forecast
 print("1.Today")
 # print("2.Hourly")
@@ -20,7 +16,7 @@ print("2.5-day")
 print("3.10-day")
 print("4.Weekend")
 # print("5.Monthly")
-t=input("Enter the type:")                                     #user input for type of forecast
+t=raw_input("Enter the type:")                                     #user input for type of forecast
 
 if p!="":
     place=p
@@ -40,14 +36,14 @@ elif t=="Monthly" or t=="monthly":
     type_of_forecast=t
 
 #get the coordinates of the place
-location = geolocator.geocode(place,timeout=20)
-print(location.address)                                 #shows the complete details of the place entered
-print((location.latitude, location.longitude))          #shows the lat and lon of the place
-
+request1= requests.get("https://api.weather.com/v3/location/search?query="+ str(p)+"&locationType=city&language=en-IN&format=json&apiKey=d522aa97197fd864d36b418f39ebb323")
+place_data=request1.json()
+# print(place_data["location"]["latitude"][0])
+# print(place_data["location"]["longitude"][0])
 
 #current data of the place
 if type_of_forecast=="Today" or type_of_forecast=="today":
-    resp= requests.get("https://api.weather.com/v2/turbo/vt1observation?apiKey=d522aa97197fd864d36b418f39ebb323&format=json&geocode=" +str(location.latitude) + "," + str(location.longitude) + "&language=en-IN&units=m")
+    resp= requests.get("https://api.weather.com/v2/turbo/vt1observation?apiKey=d522aa97197fd864d36b418f39ebb323&format=json&geocode=" +str(place_data["location"]["latitude"][0]) + "," + str(place_data["location"]["longitude"][0]) + "&language=en-IN&units=m")
     data1=resp.json()
     # print(data1)
     print("The current weather of " + str(location.address) + " is :-")
@@ -62,7 +58,7 @@ if type_of_forecast=="Today" or type_of_forecast=="today":
     print("  Pressure: "+str(data1["vt1observation"]["altimeter"])+"mb "+ str(data1["vt1observation"]["barometerTrend"]))
 
 else :
-    response=requests.get("https://api.weather.com/v2/turbo/vt1dailyForecast?apiKey=d522aa97197fd864d36b418f39ebb323&format=json&geocode=" +str(location.latitude) + "," + str(location.longitude) + "&language=en-IN&units=m")
+    response=requests.get("https://api.weather.com/v2/turbo/vt1dailyForecast?apiKey=d522aa97197fd864d36b418f39ebb323&format=json&geocode=" +str(place_data["location"]["latitude"][0]) + "," + str(place_data["location"]["longitude"][0]) + "&language=en-IN&units=m")
     data=response.json()
 
     #get the 5 day weather details of the given place

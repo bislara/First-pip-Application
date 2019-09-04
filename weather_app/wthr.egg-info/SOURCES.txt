@@ -1,0 +1,7 @@
+README.md
+setup.py
+weather_info
+wthr.egg-info/PKG-INFO
+wthr.egg-info/SOURCES.txt
+wthr.egg-info/dependency_links.txt
+wthr.egg-info/top_level.txt
