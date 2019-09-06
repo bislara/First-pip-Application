@@ -2,13 +2,40 @@
 
 import requests                             #getting data from weather.com using the weather api
 from datetime import date                   #getting the current date
+from lxml import html                       # import only html class
+
+# url to scrape data from
+url = 'https://weather.com/en-IN/'
+
+# path to particular element
+path = '/html/body/script[6]/text()'
+
+# get response object
+response = requests.get(url)
+
+# get byte string
+byte_data = response.content
+
+# get filtered source code
+source_code = html.fromstring(byte_data)
+
+# jump to preferred html element
+tree = source_code.xpath(path)
+
+# # print texts in first element in list
+# print(tree[0])
+api_key=""
+for i in range(32,64):
+    api_key=api_key+tree[0][i]
+print(api_key)
+
 
 place="Rourkela Odisha"                     #default place
 today = date.today()                        #default date
 type_of_forecast="today"                    #default type of forecast
 
-p=raw_input("Enter place in details ie place and state :")         #user place input
-d=raw_input("Enter date in yyyy-mm-dd :")                          #user date input
+p=input("Enter place in details ie place and state :")         #user place input
+d=input("Enter date in yyyy-mm-dd :")                          #user date input
 print("Enter type of forecast you want :")                     #options for type of forecast
 print("1.Today")
 # print("2.Hourly")
@@ -16,7 +43,7 @@ print("2.5-day")
 print("3.10-day")
 print("4.Weekend")
 # print("5.Monthly")
-t=raw_input("Enter the type:")                                     #user input for type of forecast
+t=input("Enter the type:")                                     #user input for type of forecast
 
 if p!="":
     place=p
@@ -36,7 +63,7 @@ elif t=="Monthly" or t=="monthly":
     type_of_forecast=t
 
 #get the coordinates of the place
-request1= requests.get("https://api.weather.com/v3/location/search?query="+ str(p)+"&locationType=city&language=en-IN&format=json&apiKey=d522aa97197fd864d36b418f39ebb323")
+request1= requests.get("https://api.weather.com/v3/location/search?query="+ str(p)+"&locationType=city&language=en-IN&format=json&apiKey="+api_key)
 place_data=request1.json()
 # print(place_data["location"]["latitude"][0])
 # print(place_data["location"]["longitude"][0])
@@ -132,12 +159,12 @@ def weekend_data(data):
 
 #current data of the place
 if type_of_forecast=="Today" or type_of_forecast=="today":
-    resp= requests.get("https://api.weather.com/v2/turbo/vt1observation?apiKey=d522aa97197fd864d36b418f39ebb323&format=json&geocode=" +str(place_data["location"]["latitude"][0]) + "," + str(place_data["location"]["longitude"][0]) + "&language=en-IN&units=m")
+    resp= requests.get("https://api.weather.com/v2/turbo/vt1observation?apiKey="+api_key+"&format=json&geocode=" +str(place_data["location"]["latitude"][0]) + "," + str(place_data["location"]["longitude"][0]) + "&language=en-IN&units=m")
     data1=resp.json()
     today_data(data1)
     
 else :
-    response=requests.get("https://api.weather.com/v2/turbo/vt1dailyForecast?apiKey=d522aa97197fd864d36b418f39ebb323&format=json&geocode=" +str(place_data["location"]["latitude"][0]) + "," + str(place_data["location"]["longitude"][0]) + "&language=en-IN&units=m")
+    response=requests.get("https://api.weather.com/v2/turbo/vt1dailyForecast?apiKey="+api_key+"&format=json&geocode=" +str(place_data["location"]["latitude"][0]) + "," + str(place_data["location"]["longitude"][0]) + "&language=en-IN&units=m")
     data=response.json()
 
     #get the 5 day weather details of the given place
